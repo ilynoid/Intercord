@@ -5,10 +5,12 @@ Intercord
 
 Easy to use interactive discord bot structure written in python, by [noid#6900](https://discordapp.com/users/981079408850903111/).
 
+Intercord offers an object for the implementation of a discord bot that acts like a user due to it taking input by the operator over the bot having assigned operations and answers. Intercord also can be a good way to have a good time with your buddies by joking around with them as you "control" your bot with your mind.
+
 Features
 -
 
-- Async IO
+- Asynchronous IO
 - Easy to use
 
 Examples
