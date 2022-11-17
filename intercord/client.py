@@ -16,6 +16,7 @@ class InteractiveClient(disnake.Client):
     async def on_ready(self) -> None:
         os.system("cls")
         _logger.info("[Event]: Bot Is Ready!")
+        _logger.info(f"[Event]: Ready to send messages")
 
     async def on_message(self, message) -> None:
         if message.author.bot:
@@ -29,7 +30,13 @@ class InteractiveClient(disnake.Client):
         channel = self.get_channel(self.channel_id) or await self.fetch_channel(self.channel_id)
         while True:
             reply = await self.loop.run_in_executor(None, lambda: input(">>> "))
-            await channel.send(reply)
+            try:
+                await channel.send(reply)
+            except (disnake.HTTPException, disnake.Forbidden) as e:
+                if isinstance(e, disnake.HTTPException):
+                    _logger.error(f"[Error]: An error occurred while sending the message\n    {e}")
+                _logger.error(f"[Error]: Forbidden, you do not have the proper permissions to send the message\n    {e}")
+                continue
             _logger.info(f"[Event]: Message Sent: {repr(reply)}")
 
     async def start(self, token: str) -> None:
