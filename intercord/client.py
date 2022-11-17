@@ -16,7 +16,7 @@ class InteractiveClient(disnake.Client):
     async def on_ready(self) -> None:
         os.system("cls")
         _logger.info("[Event]: Bot Is Ready!")
-        _logger.info(f"[Info]: Ready to send messages")
+        _logger.info(f"[Event]: Ready to send messages")
 
     async def on_message(self, message) -> None:
         if message.author.bot:
