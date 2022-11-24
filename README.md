@@ -25,7 +25,9 @@ import intercord
 
 
 async def main():
-    client = intercord.InteractiveClient(channel_id=0000000000000000000, intents=disnake.Intents(message_content=True, guilds=True))
+    intents = disnake.Intents.default()
+    intents.message_content=True
+    client = intercord.InteractiveClient(channel_id=0000000000000000000, intents=intents)
     await client.start("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 if __name__ == "__main__":
