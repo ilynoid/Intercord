@@ -27,8 +27,8 @@ import intercord
 async def main():
     intents = disnake.Intents.default()
     intents.message_content=True
-    client = intercord.InteractiveClient(channel_id=0000000000000000000, intents=intents)
-    await client.start("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+    bot = intercord.InteractiveBot(channel_id=1041053246661349450, command_prefix=";", intents=intents)
+    await bot.start("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
