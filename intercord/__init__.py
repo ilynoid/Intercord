@@ -3,5 +3,5 @@ __author__ = "Noid"
 __license__ = "MIT"
 __version__ = "1.0"
 
-from .client import *
+from .bot import *
 from .exts import *
