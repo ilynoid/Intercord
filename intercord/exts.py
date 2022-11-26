@@ -17,6 +17,6 @@ class ExtsContainer:
     def check(self, attr, value):
         if not isinstance(value, set):
             raise ValueError(f"Expected type set, got {value.__class__!r}")
-    
+
     def __repr__(self) -> str:
         return f"<ExtsContainer folders={self.folders} files={self.files}>"

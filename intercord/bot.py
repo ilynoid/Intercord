@@ -22,11 +22,7 @@ class InteractiveBot(commands.Bot):
     )
 
     def __init__(
-        self,
-        *,
-        channel_id: int,
-        extensions: ExtsContainer | None = None,
-        **kwargs
+        self, *, channel_id: int, extensions: ExtsContainer | None = None, **kwargs
     ) -> None:
         self.channel_id = channel_id
         self.ext = extensions
@@ -36,7 +32,7 @@ class InteractiveBot(commands.Bot):
         if self.ext:
             for _dir in self.ext.folders:
                 self.load_extensions(_dir)
-            
+
             for _file in self.ext.files:
                 self.load_extension(_file)
 
@@ -85,7 +81,7 @@ class InteractiveBot(commands.Bot):
         elif message == "users":
             print("\n".join(map(lambda _: _.name, self.users)))
             return True
-        
+
         return False
 
     async def start(self, token: str) -> None:
