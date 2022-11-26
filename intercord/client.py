@@ -6,7 +6,7 @@ import os
 
 from disnake.ext import commands
 
-from . import __version__
+import intercord
 from .exts import ExtsContainer
 
 __all__: tuple[str, ...] = ("InteractiveBot",)
@@ -58,7 +58,7 @@ class InteractiveBot(commands.Bot):
 
     async def on_ready(self) -> None:
         print(
-            f'Intercord {__version__}\nType "!help" for more information.\n'
+            f'Intercord {intercord.__version__}\nType "!help" for more information.\n'
         )
         _logger.info("[EVENT]:\n\tBot Is Ready!")
         _logger.info("[EVENT]:\n\tReady to send messages")
@@ -71,7 +71,7 @@ class InteractiveBot(commands.Bot):
 
     async def _awaiter(self) -> None:
         await self.wait_until_ready()
-        #os.system("cls")
+        os.system("cls")
         channel = self.get_channel(self.channel_id) or await self.fetch_channel(
             self.channel_id
         )
