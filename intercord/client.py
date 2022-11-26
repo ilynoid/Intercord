@@ -1,9 +1,13 @@
+from __future__ import annotations
+
+from typing import Optional
 import logging
 import os
 
 from disnake.ext import commands
 
-import intercord
+from . import __version__
+from .exts import ExtsContainer
 
 __all__: tuple[str, ...] = ("InteractiveBot",)
 
@@ -11,16 +15,50 @@ _logger = logging.getLogger(__name__)
 
 
 class InteractiveBot(commands.Bot):
+    _COMMANDS: tuple[str, ...] = (
+        "help",
+        "guilds",
+        "users",
+    )
 
-    _COMMANDS: tuple[str, ...] = ("help", "guilds", "users")
-
-    def __init__(self, *, channel_id: int, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        channel_id: int,
+        extensions: ExtsContainer,
+        **kwargs
+    ) -> None:
         self.channel_id = channel_id
         super().__init__(**kwargs)
 
+    @property
+    def extensions(self) -> Optional[ExtsContainer]:
+        return self.__dict__.get("extensions", None)
+    
+    @extensions.setter
+    def extensions(self, value: ExtsContainer) -> None:
+        if not isinstance(value, ExtsContainer):
+            raise ValueError(f"Expected ExtsContainer, got {value.__class__!r}")
+        self.extensions = value 
+
+    def check_and_load_extensions(self) -> None:
+        if self.extensions:
+            for _dir in self.extensions.folders:
+                if not os.path.isdir(_dir):
+                    continue
+                
+                self.load_extensions(_dir)
+            
+            for _file in self.extensions.files:
+                print(_file)
+                if not os.path.isfile(_file):
+                    continue
+                
+                self.load_extension(_file)             
+
     async def on_ready(self) -> None:
         print(
-            f'Intercord {intercord.__version__}\nType "!help" for more information.\n'
+            f'Intercord {__version__}\nType "!help" for more information.\n'
         )
         _logger.info("[EVENT]:\n\tBot Is Ready!")
         _logger.info("[EVENT]:\n\tReady to send messages")
@@ -33,14 +71,14 @@ class InteractiveBot(commands.Bot):
 
     async def _awaiter(self) -> None:
         await self.wait_until_ready()
-        os.system("cls")
+        #os.system("cls")
         channel = self.get_channel(self.channel_id) or await self.fetch_channel(
             self.channel_id
         )
         while True:
             message = await self.loop.run_in_executor(None, lambda: input(">>> "))
             if not message.startswith("!"):
-                await channel.send(message)
+                await channel.send(message) # type: ignore
             else:
                 if not await self._command_parser(message.lower()[1:]):
                     _logger.warning(f"[WARNING]:\n\tUnknown command named: {message}")
@@ -63,6 +101,8 @@ class InteractiveBot(commands.Bot):
         elif message == "users":
             print("\n".join(map(lambda _: _.name, self.users)))
             return True
+        
+        return False
 
     async def start(self, token: str) -> None:
         self.loop.create_task(self._awaiter())
