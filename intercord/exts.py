@@ -1,21 +1,22 @@
-__all__: tuple[str, ...] = (
-    "ExtsContainer",
-)
+import attrs
+
+__all__: tuple[str, ...] = ("ExtsContainer",)
 
 
+@attrs.define(kw_only=True)
 class ExtsContainer:
+    folders: set = attrs.field()
+    files: set = attrs.field()
 
-    def __init__(
-        self,
-        *,
-        folders: set[str] = set(),
-        files: set[str] = set(),
-    ) -> None:
-        
-        if not isinstance(folders, set) or not isinstance(files, set):
-            raise ValueError(f"Expected set, got {folders.__class__!r}")
-        self.folders = folders
-        self.files = files
+    @folders.validator
+    def check(self, attr, value):
+        if not isinstance(value, set):
+            raise ValueError(f"Expected type set, got {value.__class__!r}")
+
+    @files.validator
+    def check(self, attr, value):
+        if not isinstance(value, set):
+            raise ValueError(f"Expected type set, got {value.__class__!r}")
     
     def __repr__(self) -> str:
         return f"<ExtsContainer folders={self.folders} files={self.files}>"

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional
 import logging
 import os
 
 from disnake.ext import commands
 
 import intercord
+
 from .exts import ExtsContainer
 
 __all__: tuple[str, ...] = ("InteractiveBot",)
@@ -25,36 +25,24 @@ class InteractiveBot(commands.Bot):
         self,
         *,
         channel_id: int,
-        extensions: ExtsContainer,
+        extensions: ExtsContainer | None = None,
         **kwargs
     ) -> None:
         self.channel_id = channel_id
+        self.ext = extensions
         super().__init__(**kwargs)
 
-    @property
-    def extensions(self) -> Optional[ExtsContainer]:
-        return self.__dict__.get("extensions", None)
-    
-    @extensions.setter
-    def extensions(self, value: ExtsContainer) -> None:
-        if not isinstance(value, ExtsContainer):
-            raise ValueError(f"Expected ExtsContainer, got {value.__class__!r}")
-        self.extensions = value 
-
-    def check_and_load_extensions(self) -> None:
+    def _check_and_load_extensions(self) -> None:
         if self.extensions:
-            for _dir in self.extensions.folders:
-                if not os.path.isdir(_dir):
-                    continue
-                
-                self.load_extensions(_dir)
-            
-            for _file in self.extensions.files:
-                print(_file)
-                if not os.path.isfile(_file):
-                    continue
-                
-                self.load_extension(_file)             
+            for _dir, _file in zip(self.ext.folders, self.ext.files):
+                if os.path.isdir(_dir):
+                    self.load_extensions(_dir)
+                else:
+                    raise ValueError("Not a valid directory path")
+                if os.path.isfile(_file):
+                    self.load_extension(_file)
+                else:
+                    raise ValueError("Not a valid file path")  
 
     async def on_ready(self) -> None:
         print(
@@ -78,7 +66,7 @@ class InteractiveBot(commands.Bot):
         while True:
             message = await self.loop.run_in_executor(None, lambda: input(">>> "))
             if not message.startswith("!"):
-                await channel.send(message) # type: ignore
+                await channel.send(message)
             else:
                 if not await self._command_parser(message.lower()[1:]):
                     _logger.warning(f"[WARNING]:\n\tUnknown command named: {message}")
@@ -106,4 +94,5 @@ class InteractiveBot(commands.Bot):
 
     async def start(self, token: str) -> None:
         self.loop.create_task(self._awaiter())
+        self._check_and_load_extensions()
         await super().start(token)
