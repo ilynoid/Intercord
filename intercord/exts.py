@@ -5,8 +5,8 @@ __all__: tuple[str, ...] = ("ExtsContainer",)
 
 @attrs.define(kw_only=True)
 class ExtsContainer:
-    folders: set = attrs.field()
-    files: set = attrs.field()
+    folders: set = attrs.field(default=set())
+    files: set = attrs.field(default=set())
 
     @folders.validator
     def check(self, attr, value):

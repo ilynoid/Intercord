@@ -33,16 +33,12 @@ class InteractiveBot(commands.Bot):
         super().__init__(**kwargs)
 
     def _check_and_load_extensions(self) -> None:
-        if self.extensions:
-            for _dir, _file in zip(self.ext.folders, self.ext.files):
-                if os.path.isdir(_dir):
-                    self.load_extensions(_dir)
-                else:
-                    raise ValueError("Not a valid directory path")
-                if os.path.isfile(_file):
-                    self.load_extension(_file)
-                else:
-                    raise ValueError("Not a valid file path")  
+        if self.ext:
+            for _dir in self.ext.folders:
+                self.load_extensions(_dir)
+            
+            for _file in self.ext.files:
+                self.load_extension(_file)
 
     async def on_ready(self) -> None:
         print(
