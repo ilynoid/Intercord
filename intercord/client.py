@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 
@@ -5,18 +7,38 @@ from disnake.ext import commands
 
 import intercord
 
+from .exts import ExtsContainer
+
 __all__: tuple[str, ...] = ("InteractiveBot",)
 
 _logger = logging.getLogger(__name__)
 
 
 class InteractiveBot(commands.Bot):
+    _COMMANDS: tuple[str, ...] = (
+        "help",
+        "guilds",
+        "users",
+    )
 
-    _COMMANDS: tuple[str, ...] = ("help", "guilds", "users")
-
-    def __init__(self, *, channel_id: int, **kwargs) -> None:
+    def __init__(
+        self,
+        *,
+        channel_id: int,
+        extensions: ExtsContainer | None = None,
+        **kwargs
+    ) -> None:
         self.channel_id = channel_id
+        self.ext = extensions
         super().__init__(**kwargs)
+
+    def _check_and_load_extensions(self) -> None:
+        if self.ext:
+            for _dir in self.ext.folders:
+                self.load_extensions(_dir)
+            
+            for _file in self.ext.files:
+                self.load_extension(_file)
 
     async def on_ready(self) -> None:
         print(
@@ -63,7 +85,10 @@ class InteractiveBot(commands.Bot):
         elif message == "users":
             print("\n".join(map(lambda _: _.name, self.users)))
             return True
+        
+        return False
 
     async def start(self, token: str) -> None:
         self.loop.create_task(self._awaiter())
+        self._check_and_load_extensions()
         await super().start(token)
